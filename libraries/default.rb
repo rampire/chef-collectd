@@ -55,11 +55,15 @@ def collectd_plugin_settings(options, level=0, overide_hash=false)
   options.each_pair do |key, value|
     if value.is_a? Array
       value.each do |subvalue|
-        output << <<-CFG
+        if subvalue.is_a? Array or subvalue.is_a? Hash
+          output << <<-CFG
 #{ indent }<#{ collectd_key(key) }>
 #{ collectd_plugin_settings(subvalue, level+1, true) }
 #{ indent }</#{ collectd_key(key) }>
 CFG
+        else
+          output << "#{ indent }#{ collectd_key(key) } #{ collectd_option(subvalue) }"
+        end
       end
     elsif value.is_a? Hash
       value.each_pair do |name, suboptions|
